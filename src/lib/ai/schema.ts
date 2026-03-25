@@ -50,6 +50,9 @@ export const proposalOutputSchema = z.object({
   subtotal: z.number().describe("Subtotal in INR"),
   gst_rate: z.number().describe("GST rate as percentage"),
   gst_amount: z.number().describe("Total GST amount in INR"),
+  cgst_amount: z.number().optional().describe("CGST amount (intra-state)"),
+  sgst_amount: z.number().optional().describe("SGST amount (intra-state)"),
+  igst_amount: z.number().optional().describe("IGST amount (inter-state)"),
   total: z.number().describe("Total project cost in INR"),
   payment_terms: z.string().describe("Payment structure (e.g., '50% advance, 50% on delivery')"),
   payment_schedule: z.array(

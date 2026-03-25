@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
-  FileText,
-  ArrowLeft,
   Save,
   Upload,
   Building2,
@@ -14,9 +11,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, saveSettings, type BusinessSettings } from "@/lib/store";
+import Navbar from "@/components/Navbar";
+import { useToast } from "@/components/Toast";
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState<BusinessSettings>({
     full_name: "",
     business_name: "",
@@ -48,6 +48,7 @@ export default function SettingsPage() {
   const handleSave = () => {
     saveSettings(formData);
     setSaved(true);
+    toast("Settings saved", "success");
     setTimeout(() => setSaved(false), 3000);
   };
 
@@ -55,7 +56,7 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 500_000) {
-      alert("Logo must be under 500KB");
+      toast("Logo must be under 500KB", "error");
       return;
     }
     const reader = new FileReader();
@@ -74,25 +75,7 @@ export default function SettingsPage() {
 
   return (
     <main className="min-h-screen bg-dark-900">
-      <nav className="border-b border-white/5 bg-dark-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">
-              Bill<span className="gradient-text">Craft</span>
-            </span>
-          </Link>
-          <Link
-            href="/dashboard"
-            className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Dashboard
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="mx-auto max-w-2xl px-6 py-10">
         <div className="mb-10">

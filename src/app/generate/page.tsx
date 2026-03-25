@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 import {
   FileText,
   Zap,
   Download,
-  Mail,
-  ArrowLeft,
   Loader2,
   Sparkles,
   RotateCcw,
@@ -263,9 +262,19 @@ export default function GeneratePage() {
     <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;">
       <span>Subtotal</span><span>₹${data.subtotal.toLocaleString("en-IN")}</span>
     </div>
+    ${data.cgst_amount && data.sgst_amount ? `
+    <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;">
+      <span>CGST (${data.gst_rate / 2}%)</span><span>₹${data.cgst_amount.toLocaleString("en-IN")}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;">
+      <span>SGST (${data.gst_rate / 2}%)</span><span>₹${data.sgst_amount.toLocaleString("en-IN")}</span>
+    </div>` : data.igst_amount ? `
+    <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;">
+      <span>IGST (${data.gst_rate}%)</span><span>₹${data.igst_amount.toLocaleString("en-IN")}</span>
+    </div>` : `
     <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:14px;">
       <span>GST (${data.gst_rate}%)</span><span>₹${data.gst_amount.toLocaleString("en-IN")}</span>
-    </div>
+    </div>`}
     <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:16px;font-weight:700;border-top:1px solid #ddd;margin-top:4px;">
       <span>Total</span><span>₹${data.total.toLocaleString("en-IN")}</span>
     </div>
@@ -315,31 +324,7 @@ export default function GeneratePage() {
 
   return (
     <main className="min-h-screen bg-dark-900">
-      {/* Header */}
-      <nav className="border-b border-white/5 bg-dark-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">
-              Bill<span className="gradient-text">Craft</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Dashboard
-            </Link>
-            <Link
-              href="/"
-              className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Home
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="mx-auto max-w-5xl px-6 py-10">
         {!result ? (
@@ -629,7 +614,16 @@ function InvoicePreview({
 
       <div className="border-t border-white/10 pt-4 space-y-2">
         <div className="flex justify-between text-sm"><span className="text-gray-400">Subtotal</span><span className="text-white">{formatCurrency(data.subtotal)}</span></div>
-        <div className="flex justify-between text-sm"><span className="text-gray-400">GST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.gst_amount)}</span></div>
+        {data.cgst_amount && data.sgst_amount ? (
+          <>
+            <div className="flex justify-between text-sm"><span className="text-gray-400">CGST ({data.gst_rate / 2}%)</span><span className="text-white">{formatCurrency(data.cgst_amount)}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-gray-400">SGST ({data.gst_rate / 2}%)</span><span className="text-white">{formatCurrency(data.sgst_amount)}</span></div>
+          </>
+        ) : data.igst_amount ? (
+          <div className="flex justify-between text-sm"><span className="text-gray-400">IGST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.igst_amount)}</span></div>
+        ) : (
+          <div className="flex justify-between text-sm"><span className="text-gray-400">GST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.gst_amount)}</span></div>
+        )}
         <div className="flex justify-between text-sm font-semibold border-t border-white/10 pt-2"><span className="text-white">Total</span><span className="text-white">{formatCurrency(data.total)}</span></div>
         {data.advance_paid > 0 && (
           <div className="flex justify-between text-sm"><span className="text-gray-400">Advance Paid</span><span className="text-emerald-500">-{formatCurrency(data.advance_paid)}</span></div>
@@ -742,7 +736,16 @@ function ProposalPreview({
         </div>
         <div className="border-t border-white/10 pt-3 space-y-2">
           <div className="flex justify-between text-sm"><span className="text-gray-400">Subtotal</span><span className="text-white">{formatCurrency(data.subtotal)}</span></div>
-          <div className="flex justify-between text-sm"><span className="text-gray-400">GST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.gst_amount)}</span></div>
+          {data.cgst_amount && data.sgst_amount ? (
+            <>
+              <div className="flex justify-between text-sm"><span className="text-gray-400">CGST ({data.gst_rate / 2}%)</span><span className="text-white">{formatCurrency(data.cgst_amount)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-gray-400">SGST ({data.gst_rate / 2}%)</span><span className="text-white">{formatCurrency(data.sgst_amount)}</span></div>
+            </>
+          ) : data.igst_amount ? (
+            <div className="flex justify-between text-sm"><span className="text-gray-400">IGST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.igst_amount)}</span></div>
+          ) : (
+            <div className="flex justify-between text-sm"><span className="text-gray-400">GST ({data.gst_rate}%)</span><span className="text-white">{formatCurrency(data.gst_amount)}</span></div>
+          )}
           <div className="flex justify-between text-base font-bold bg-amber-500/10 rounded-xl px-4 py-3 mt-2">
             <span className="text-white">Total Investment</span>
             <span className="text-amber-400">{formatCurrency(data.total)}</span>
