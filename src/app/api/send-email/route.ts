@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimit } from "@/lib/rate-limit";
+import { generatePDFBuffer, type PDFData, type BusinessInfo } from "@/lib/pdf-generator";
 
 const getResendClient = () => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (rateLimitResponse) return rateLimitResponse;
 
     const body = await request.json();
-    const { to, subject, document_number, client_name, html_content } = body;
+    const { to, subject, document_number, client_name, html_content, pdf_data, business_info } = body;
 
     if (!to || !subject || !html_content) {
       return NextResponse.json(
@@ -68,6 +69,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate PDF attachment if data is provided
+    let attachments: { filename: string; content: Buffer }[] | undefined;
+    if (pdf_data) {
+      try {
+        const pdfBuffer = await generatePDFBuffer(
+          pdf_data as PDFData,
+          (business_info || {}) as BusinessInfo
+        );
+        const filename = `${document_number || "document"}.pdf`;
+        attachments = [{ filename, content: pdfBuffer }];
+      } catch (pdfErr) {
+        console.error("PDF generation error:", pdfErr);
+        // Continue without attachment — don't block the email
+      }
+    }
+
     const { data, error } = await resend.emails.send({
       from: "BillCraft <noreply@billcraft.in>",
       to: [to],
@@ -82,7 +99,7 @@ export async function POST(request: NextRequest) {
               Hi${client_name ? ` ${client_name}` : ""},
             </p>
             <p style="color:#333;font-size:14px;line-height:1.6;">
-              Please find the ${document_number ? `document (${document_number})` : "document"} details below.
+              Please find the ${document_number ? `document (${document_number})` : "document"} details below.${attachments ? " A PDF copy is attached." : ""}
             </p>
             <div style="margin:24px 0;padding:20px;background:#fafafa;border-radius:8px;border:1px solid #eee;">
               ${sanitizedContent}
@@ -93,6 +110,7 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
+      ...(attachments ? { attachments } : {}),
     });
 
     if (error) {
@@ -103,7 +121,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, messageId: data?.id });
+    return NextResponse.json({
+      success: true,
+      messageId: data?.id,
+      hasAttachment: !!attachments,
+    });
   } catch (error) {
     console.error("Email error:", error);
     return NextResponse.json(
