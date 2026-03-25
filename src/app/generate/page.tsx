@@ -562,8 +562,10 @@ function InvoicePreview({
       <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
         <div>
           {settings?.logo_base64 && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={settings.logo_base64} alt="Logo" className="h-10 mb-2 rounded" />
+            <div className="mb-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={settings.logo_base64} alt="Logo" className="h-10 rounded" />
+            </div>
           )}
           <h3 className="text-xl font-bold text-white mb-0.5">
             {settings?.business_name || "Your Business Name"}
@@ -681,8 +683,10 @@ function ProposalPreview({
     <div>
       <div className="text-center mb-8 pb-6 border-b border-white/10">
         {settings?.logo_base64 && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={settings.logo_base64} alt="Logo" className="h-10 mx-auto mb-3 rounded" />
+          <div className="mb-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={settings.logo_base64} alt="Logo" className="h-10 mx-auto rounded" />
+          </div>
         )}
         <span className="inline-block bg-amber-500/15 text-amber-400 text-xs font-medium px-3 py-1.5 rounded-full mb-3">
           {documentNumber}

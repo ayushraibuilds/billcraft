@@ -47,22 +47,13 @@ export function rateLimit(
   }
 
   entry.count++;
-  return null; // allowed
-}
 
-// Clean up old entries every 5 minutes to prevent memory leak
-if (typeof globalThis !== "undefined") {
-  const CLEANUP_INTERVAL = 5 * 60_000;
-  let lastCleanup = Date.now();
-
-  const cleanup = () => {
-    const now = Date.now();
-    if (now - lastCleanup < CLEANUP_INTERVAL) return;
-    lastCleanup = now;
-    for (const [key, entry] of requestLog.entries()) {
-      if (now > entry.resetAt) requestLog.delete(key);
+  // Inline cleanup: prune expired entries on every 20th request
+  if (entry.count % 20 === 0) {
+    for (const [k, v] of requestLog.entries()) {
+      if (now > v.resetAt) requestLog.delete(k);
     }
-  };
+  }
 
-  setInterval(cleanup, CLEANUP_INTERVAL);
+  return null; // allowed
 }
