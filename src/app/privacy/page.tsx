@@ -1,0 +1,63 @@
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+export const metadata = {
+  title: "Privacy Policy — BillCraft",
+  description: "BillCraft privacy policy — how we handle your data.",
+};
+
+export default function PrivacyPage() {
+  return (
+    <main className="min-h-screen bg-dark-900">
+      <Navbar />
+      <div className="pt-32 pb-20 section-padding">
+        <div className="mx-auto max-w-3xl prose-invert">
+          <h1 className="text-3xl font-bold text-white mb-8">Privacy Policy</h1>
+          <p className="text-sm text-gray-500 mb-8">Last updated: March 2026</p>
+
+          <div className="space-y-8 text-sm text-gray-300 leading-relaxed">
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">What We Collect</h2>
+              <p>BillCraft collects only the minimum data needed to provide the service:</p>
+              <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-400">
+                <li>Business details you enter in Settings (name, GSTIN, address, bank info)</li>
+                <li>Document data you generate (invoices, proposals, client names, amounts)</li>
+                <li>Your email address if you create an account</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">How We Store It</h2>
+              <p>On the free tier, all data is stored locally in your browser (localStorage). We do not transmit or store your business data on our servers unless you create an account to enable cross-device sync.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">AI Processing</h2>
+              <p>When you generate a document, your project description is sent to our AI provider (Google Gemini or Groq) for processing. We do not retain this data after the response is returned. The AI providers&apos; own privacy policies apply to this processing.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">Third-Party Services</h2>
+              <ul className="list-disc pl-6 space-y-1 text-gray-400">
+                <li><strong>Google Gemini / Groq:</strong> AI text generation</li>
+                <li><strong>Resend:</strong> Email delivery (when sending invoices to clients)</li>
+                <li><strong>Vercel:</strong> Hosting and deployment</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">Your Rights</h2>
+              <p>You can delete all your data at any time by clearing your browser&apos;s localStorage. If you have an account, contact us at <span className="text-amber-400">hello@billcraft.in</span> to request data deletion.</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold text-white mb-3">Contact</h2>
+              <p>Questions? Email us at <span className="text-amber-400">hello@billcraft.in</span></p>
+            </section>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </main>
+  );
+}

@@ -130,6 +130,15 @@
   50% { opacity: 0.8; }
 }
 
+@keyframes slide-up {
+  0% { opacity: 0; transform: translateY(16px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

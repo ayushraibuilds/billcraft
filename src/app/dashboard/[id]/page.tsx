@@ -9,22 +9,32 @@ import {
   Download,
   CheckCircle2,
   Loader2,
+  Trash2,
+  Mail,
+  X,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
   getDocuments,
   getSettings,
+  deleteDocument,
   type SavedDocument,
   type BusinessSettings,
 } from "@/lib/store";
+import { useToast } from "@/components/Toast";
 import type { InvoiceOutput, ProposalOutput } from "@/lib/ai/schema";
 
 export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { toast } = useToast();
   const [doc, setDoc] = useState<SavedDocument | null>(null);
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
 
   useEffect(() => {
     const docs = getDocuments();
@@ -131,6 +141,44 @@ export default function DocumentDetailPage() {
     setTimeout(() => printWindow.print(), 500);
   };
 
+  const handleDelete = () => {
+    if (!doc) return;
+    deleteDocument(doc.id);
+    toast("Document deleted", "success");
+    router.push("/dashboard");
+  };
+
+  const handleSendEmail = async () => {
+    if (!doc || !emailTo) return;
+    setEmailSending(true);
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: emailTo,
+          subject: `${doc.document_number} — ${doc.type === "invoice" ? "Invoice" : "Proposal"}`,
+          document_number: doc.document_number,
+          client_name: doc.client_name,
+          html_content: `<p><strong>${doc.document_number}</strong> — ${formatCurrency(doc.amount)}</p>`,
+        }),
+      });
+      const data = await res.json();
+      if (data.demo) {
+        toast("Email service not configured — add RESEND_API_KEY", "info");
+      } else if (res.ok) {
+        toast(`Email sent to ${emailTo}`, "success");
+      } else {
+        toast(data.error || "Failed to send email", "error");
+      }
+    } catch {
+      toast("Failed to send email", "error");
+    }
+    setEmailSending(false);
+    setShowEmailModal(false);
+    setEmailTo("");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-dark-900 flex items-center justify-center">
@@ -174,6 +222,55 @@ export default function DocumentDetailPage() {
         </div>
       </nav>
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="glass-card p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-white mb-2">Delete document?</h3>
+            <p className="text-sm text-gray-400 mb-6">
+              This will permanently remove {doc.document_number} from your history. This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowDeleteConfirm(false)} className="btn-secondary flex-1 text-sm !py-2.5">
+                Cancel
+              </button>
+              <button onClick={handleDelete} className="flex-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl text-sm font-semibold py-2.5 hover:bg-red-500/30 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="glass-card p-6 max-w-sm w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Email to client</h3>
+              <button onClick={() => setShowEmailModal(false)} className="text-gray-500 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <input
+              type="email"
+              value={emailTo}
+              onChange={(e) => setEmailTo(e.target.value)}
+              placeholder="client@email.com"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500/30 mb-4"
+            />
+            <button
+              onClick={handleSendEmail}
+              disabled={!emailTo || emailSending}
+              className="btn-primary w-full flex items-center justify-center gap-2 text-sm !py-2.5 disabled:opacity-50"
+            >
+              {emailSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+              {emailSending ? "Sending..." : "Send Email"}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -188,12 +285,26 @@ export default function DocumentDetailPage() {
               <span className="text-xs text-gray-600 capitalize">{doc.service_category}</span>
             </div>
           </div>
-          <button
-            onClick={handleDownloadPDF}
-            className="btn-primary flex items-center gap-2 text-sm !py-2.5 !px-5"
-          >
-            <Download className="w-4 h-4" /> Download PDF
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handleDownloadPDF}
+              className="btn-primary flex items-center gap-2 text-sm !py-2.5 !px-4"
+            >
+              <Download className="w-4 h-4" /> PDF
+            </button>
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="btn-secondary flex items-center gap-2 text-sm !py-2.5 !px-4"
+            >
+              <Mail className="w-4 h-4" /> Email
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex items-center gap-2 text-sm py-2.5 px-4 rounded-xl border border-red-500/20 text-red-400/70 hover:text-red-400 hover:border-red-500/40 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="glass-card p-8 max-w-3xl mx-auto">

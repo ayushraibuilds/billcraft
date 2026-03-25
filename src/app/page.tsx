@@ -213,8 +213,8 @@ export default function HomePage() {
               },
               {
                 icon: Zap,
-                title: "Smart Client Memory",
-                desc: "Auto-saves client details from past invoices. Next time, just mention the name — we remember.",
+                title: "Document History",
+                desc: "Every invoice and proposal is auto-saved. Search, re-view, and re-download from your dashboard anytime.",
               },
             ].map((feature, i) => (
               <div

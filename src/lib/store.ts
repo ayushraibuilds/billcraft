@@ -109,6 +109,15 @@ export function updateDocumentStatus(
   }
 }
 
+export function deleteDocument(id: string): boolean {
+  if (typeof window === "undefined") return false;
+  const docs = getDocuments();
+  const filtered = docs.filter((d) => d.id !== id);
+  if (filtered.length === docs.length) return false; // not found
+  localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(filtered));
+  return true;
+}
+
 // ── Document Counter ──
 export function getNextDocumentNumber(type: "invoice" | "proposal"): string {
   if (typeof window === "undefined") return type === "invoice" ? "INV-2026-001" : "PROP-2026-001";
