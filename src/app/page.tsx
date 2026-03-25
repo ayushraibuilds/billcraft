@@ -268,25 +268,25 @@ export default function HomePage() {
               Simple, freelancer-friendly pricing
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto">
-              Start free. Upgrade only when BillCraft pays for itself —
-              which happens after your first invoice.
+              BillCraft is currently in <span className="text-amber-400 font-medium">free beta</span>. All features are available at no cost while we refine the product.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <PricingCard
-              name="Free"
+              name="Free Beta"
               price="₹0"
               period="/forever"
+              popular
               features={[
                 { text: "3 documents/month", included: true },
                 { text: "Invoice + Proposal", included: true },
+                { text: "GST-compliant (CGST/SGST/IGST)", included: true },
                 { text: "PDF download", included: true },
-                { text: "Basic templates", included: true },
-                { text: "\"Powered by BillCraft\" watermark", included: true },
-                { text: "GST invoice mode", included: false },
-                { text: "Custom branding", included: false },
-                { text: "Email to client", included: false },
+                { text: "Email to client", included: true },
+                { text: "Custom logo + branding", included: true },
+                { text: "Export/Import data backup", included: true },
+                { text: "AI-powered generation", included: true },
               ]}
               ctaText="Start Free"
               ctaHref="/generate"
@@ -295,19 +295,18 @@ export default function HomePage() {
               name="Pro"
               price={199}
               period="/mo"
-              popular
               features={[
                 { text: "Unlimited documents", included: true },
-                { text: "Invoice + Proposal + Contract", included: true },
-                { text: "PDF + Email to client", included: true },
-                { text: "All niche templates", included: true },
+                { text: "Cloud sync across devices", included: true },
+                { text: "Client directory", included: true },
+                { text: "Recurring invoices", included: true },
+                { text: "Invoice status tracking", included: true },
+                { text: "Priority AI models", included: true },
                 { text: "No watermark", included: true },
-                { text: "GST-compliant invoices", included: true },
-                { text: "Custom logo + branding", included: true },
-                { text: "Client history + search", included: true },
+                { text: "PDF attachments in email", included: true },
               ]}
-              ctaText="Get Pro — ₹199/mo"
-              ctaHref="/generate"
+              ctaText="Coming Soon"
+              disabled
             />
             <PricingCard
               name="Agency"
@@ -323,8 +322,8 @@ export default function HomePage() {
                 { text: "Custom email domain", included: true },
                 { text: "API access", included: true },
               ]}
-              ctaText="Contact for Agency"
-              ctaHref="mailto:hello@billcraft.in?subject=Agency%20Plan%20Inquiry"
+              ctaText="Coming Soon"
+              disabled
             />
           </div>
         </div>
@@ -335,7 +334,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-white mb-3">
-              Why BillCraft at ₹199/mo?
+              Why BillCraft?
             </h2>
             <p className="text-gray-400 text-sm">
               Compare with the alternatives Indian freelancers actually use
@@ -355,7 +354,7 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {[
-                  { name: "BillCraft", price: "₹199/mo", ai: true, gst: true, proposals: true, highlight: true },
+                  { name: "BillCraft", price: "Free Beta", ai: true, gst: true, proposals: true, highlight: true },
                   { name: "Zoho Invoice", price: "₹750/mo", ai: false, gst: true, proposals: false },
                   { name: "FreshBooks", price: "₹2,000/mo", ai: false, gst: false, proposals: true },
                   { name: "Invoice Ninja", price: "Free/₹800", ai: false, gst: false, proposals: true },
