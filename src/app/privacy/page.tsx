@@ -20,15 +20,16 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold text-white mb-3">What We Collect</h2>
               <p>BillCraft collects only the minimum data needed to provide the service:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-400">
-                <li>Business details you enter in Settings (name, GSTIN, address, bank info)</li>
-                <li>Document data you generate (invoices, proposals, client names, amounts)</li>
-                <li>Your email address if you create an account</li>
+                <li>Business details you enter in Settings (name, GSTIN, address, bank info) — stored in your browser only</li>
+                <li>Document data you generate (invoices, proposals, client names, amounts) — stored in your browser only</li>
+                <li>Your IP address for rate limiting (not stored permanently)</li>
+                <li>Recipient email address when you use the &ldquo;Email to client&rdquo; feature</li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">How We Store It</h2>
-              <p>On the free tier, all data is stored locally in your browser (localStorage). We do not transmit or store your business data on our servers unless you create an account to enable cross-device sync.</p>
+              <p>All data is stored locally in your browser (localStorage). We do not transmit or store your business data on our servers. Your data never leaves your device unless you explicitly use the email feature.</p>
             </section>
 
             <section>
@@ -47,7 +48,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">Your Rights</h2>
-              <p>You can delete all your data at any time by clearing your browser&apos;s localStorage. If you have an account, contact us at <span className="text-amber-400">hello@billcraft.in</span> to request data deletion.</p>
+              <p>You can delete all your data at any time by clearing your browser&apos;s localStorage or using the export/import feature in Settings. For any questions, contact us at <span className="text-amber-400">hello@billcraft.in</span>.</p>
             </section>
 
             <section>

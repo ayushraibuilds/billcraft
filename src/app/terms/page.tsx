@@ -22,13 +22,13 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-white mb-3">2. Free Tier</h2>
-              <p>The free tier allows 3 documents per month at no cost. Free-tier documents include a &ldquo;Powered by BillCraft&rdquo; watermark. No credit card is required.</p>
+              <h2 className="text-lg font-semibold text-white mb-3">2. Beta Service</h2>
+              <p>BillCraft is currently in free beta. All features are available at no cost during the beta period. The free tier allows 3 documents per month. No credit card is required. Features and limits may change as we develop paid plans.</p>
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-white mb-3">3. Paid Plans</h2>
-              <p>Pro (₹199/mo) and Agency (₹499/mo) plans are billed monthly via Razorpay. You may cancel at any time; cancellation takes effect at the end of the current billing period.</p>
+              <h2 className="text-lg font-semibold text-white mb-3">3. Data Storage</h2>
+              <p>All your data is stored locally in your browser. BillCraft does not store your business data on any server. You are responsible for backing up your data using the export feature in Settings.</p>
             </section>
 
             <section>
@@ -53,7 +53,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">7. Limitation of Liability</h2>
-              <p>BillCraft is provided &ldquo;as is.&rdquo; We are not liable for any errors in generated documents, tax miscalculations, or losses arising from use of the service. Maximum liability is limited to the fees paid in the preceding 12 months.</p>
+              <p>BillCraft is provided &ldquo;as is&rdquo; as a free beta service. We are not liable for any errors in generated documents, tax miscalculations, or losses arising from use of the service. GST calculations are provided as a convenience and should be verified independently.</p>
             </section>
 
             <section>

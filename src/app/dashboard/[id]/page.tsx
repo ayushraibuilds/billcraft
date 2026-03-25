@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -28,21 +28,20 @@ export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { toast } = useToast();
-  const [doc, setDoc] = useState<SavedDocument | null>(null);
-  const [settings, setSettings] = useState<BusinessSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [doc, setDoc] = useState<SavedDocument | null>(() => {
+    if (typeof window === "undefined") return null;
+    const docs = getDocuments();
+    return docs.find((d) => d.id === id) || null;
+  });
+  const [settings] = useState<BusinessSettings | null>(() => {
+    if (typeof window === "undefined") return null;
+    return getSettings();
+  });
+  const [loading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState("");
   const [emailSending, setEmailSending] = useState(false);
-
-  useEffect(() => {
-    const docs = getDocuments();
-    const found = docs.find((d) => d.id === id);
-    setDoc(found || null);
-    setSettings(getSettings());
-    setLoading(false);
-  }, [id]);
 
   const handleDownloadPDF = () => {
     if (!doc) return;
@@ -298,6 +297,7 @@ export default function DocumentDetailPage() {
           <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
             <div>
               {settings?.logo_base64 && (
+                // eslint-disable-next-line @next/next/no-img-element -- base64 data URI
                 <img src={settings.logo_base64} alt="Logo" className="h-10 mb-2 rounded" />
               )}
               <h3 className="text-xl font-bold text-white mb-0.5">

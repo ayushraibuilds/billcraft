@@ -56,7 +56,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Styling**: Tailwind CSS v4
 - **AI**: Google Gemini + Groq (LLaMA)
 - **Email**: Resend

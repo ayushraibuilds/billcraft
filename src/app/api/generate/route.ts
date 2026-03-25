@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateDocument } from "@/lib/ai/generate";
 import { generateInputSchema } from "@/lib/ai/schema";
-import { calculateGST, isInterStateTransaction } from "@/lib/gst";
+import { calculateGST } from "@/lib/gst";
 import { rateLimit } from "@/lib/rate-limit";
-import type { InvoiceOutput, ProposalOutput } from "@/lib/ai/schema";
+import type { InvoiceOutput } from "@/lib/ai/schema";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,10 +31,16 @@ export async function POST(request: NextRequest) {
       body.gstin
     );
 
-    // Post-process: Apply proper GST calculation if GSTIN info available
-    const sellerGstin = body.gstin as string | undefined;
-    const buyerGstin = (data as InvoiceOutput).client_email; // placeholder
-    const isInterState = isInterStateTransaction(sellerGstin, buyerGstin);
+    // Post-process: Apply proper GST calculation using real state codes
+    const sellerStateCode = (body.state_code as string | undefined) || "";
+    const clientStateCode = (body.client_state_code as string | undefined) || "";
+
+    // Determine inter-state: only if both state codes are provided and differ
+    const isInterState =
+      sellerStateCode.length >= 2 &&
+      clientStateCode.length >= 2 &&
+      sellerStateCode.substring(0, 2) !== clientStateCode.substring(0, 2);
+
     const gstBreakdown = calculateGST(data.subtotal, isInterState);
 
     // Override AI's GST with accurate calculation
@@ -42,6 +48,9 @@ export async function POST(request: NextRequest) {
       ...data,
       gst_rate: gstBreakdown.gstRate,
       gst_amount: gstBreakdown.totalGst,
+      cgst_amount: gstBreakdown.cgst,
+      sgst_amount: gstBreakdown.sgst,
+      igst_amount: gstBreakdown.igst,
       total: gstBreakdown.grandTotal,
     };
 
@@ -50,10 +59,6 @@ export async function POST(request: NextRequest) {
       const invoiceData = correctedData as InvoiceOutput;
       (correctedData as InvoiceOutput).balance_due =
         gstBreakdown.grandTotal - (invoiceData.advance_paid || 0);
-      // Add CGST/SGST/IGST breakdown
-      (correctedData as InvoiceOutput).cgst_amount = gstBreakdown.cgst;
-      (correctedData as InvoiceOutput).sgst_amount = gstBreakdown.sgst;
-      (correctedData as InvoiceOutput).igst_amount = gstBreakdown.igst;
     }
 
     return NextResponse.json({

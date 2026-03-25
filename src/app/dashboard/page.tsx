@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -8,10 +8,8 @@ import {
   Plus,
   Search,
   TrendingUp,
-  Clock,
   IndianRupee,
   BarChart3,
-  Trash2,
 } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
@@ -28,14 +26,15 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function DashboardPage() {
-  const [documents, setDocuments] = useState<SavedDocument[]>([]);
+  const [documents] = useState<SavedDocument[]>(() => {
+    if (typeof window === "undefined") return [];
+    return getDocuments();
+  });
   const [search, setSearch] = useState("");
-  const [monthlyUsage, setMonthlyUsage] = useState(0);
-
-  useEffect(() => {
-    setDocuments(getDocuments());
-    setMonthlyUsage(getMonthlyUsage());
-  }, []);
+  const [monthlyUsage] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    return getMonthlyUsage();
+  });
 
   const filtered = documents.filter(
     (doc) =>

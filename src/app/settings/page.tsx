@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Save,
   Upload,
@@ -8,37 +8,29 @@ import {
   CreditCard,
   User,
   X,
+  Download,
+  FileUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSettings, saveSettings, type BusinessSettings } from "@/lib/store";
+import { getSettings, saveSettings, exportAllData, importAllData, type BusinessSettings, type BillCraftExport } from "@/lib/store";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/components/Toast";
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const { toast } = useToast();
-  const [formData, setFormData] = useState<BusinessSettings>({
-    full_name: "",
-    business_name: "",
-    email: "",
-    phone: "",
-    address: "",
-    gstin: "",
-    state_code: "",
-    bank_account_name: "",
-    bank_account_number: "",
-    bank_ifsc: "",
-    bank_name: "",
-    upi_id: "",
-    logo_base64: "",
-    default_payment_terms: "Due on receipt",
+  const [formData, setFormData] = useState<BusinessSettings>(() => {
+    if (typeof window === "undefined") {
+      return {
+        full_name: "", business_name: "", email: "", phone: "",
+        address: "", gstin: "", state_code: "",
+        bank_account_name: "", bank_account_number: "",
+        bank_ifsc: "", bank_name: "", upi_id: "",
+        logo_base64: "", default_payment_terms: "Due on receipt",
+      };
+    }
+    return getSettings();
   });
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const stored = getSettings();
-    setFormData(stored);
-  }, []);
 
   const handleChange = (field: keyof BusinessSettings, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -123,6 +115,7 @@ export default function SettingsPage() {
               </label>
               {formData.logo_base64 ? (
                 <div className="relative inline-block">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={formData.logo_base64}
                     alt="Logo preview"
@@ -195,6 +188,66 @@ export default function SettingsPage() {
             </>
           )}
         </button>
+
+        {/* ── Data Export/Import ── */}
+        <div className="glass-card p-6 mt-6">
+          <h2 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+            <Download className="w-5 h-5 text-amber-400" />
+            Data Backup
+          </h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Export your documents and settings to a JSON file, or import from a backup.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                const data = exportAllData();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `billcraft-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                toast("Backup downloaded", "success");
+              }}
+              className="btn-secondary flex items-center gap-2 text-sm !py-2.5 !px-4"
+            >
+              <Download className="w-4 h-4" />
+              Export Data
+            </button>
+            <label className="btn-secondary flex items-center gap-2 text-sm !py-2.5 !px-4 cursor-pointer">
+              <FileUp className="w-4 h-4" />
+              Import Data
+              <input
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    try {
+                      const data = JSON.parse(ev.target?.result as string) as BillCraftExport;
+                      if (data.version !== 1 || !data.settings || !data.documents) {
+                        toast("Invalid backup file", "error");
+                        return;
+                      }
+                      const result = importAllData(data);
+                      setFormData(getSettings());
+                      toast(`Imported ${result.imported} documents (${result.skipped} skipped)`, "success");
+                    } catch {
+                      toast("Failed to read backup file", "error");
+                    }
+                  };
+                  reader.readAsText(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+        </div>
       </div>
     </main>
   );

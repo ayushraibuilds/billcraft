@@ -4,11 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import {
-  FileText,
   Zap,
   Download,
   Loader2,
-  Sparkles,
   RotateCcw,
   Palette,
   Code,
@@ -63,6 +61,7 @@ export default function GeneratePage() {
     provider: string;
     document_type: string;
     documentNumber: string;
+    isDemo?: boolean;
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [settings, setSettings] = useState<BusinessSettings | null>(null);
@@ -99,6 +98,8 @@ export default function GeneratePage() {
           service_category: serviceCategory,
           business_name: settings?.business_name,
           gstin: settings?.gstin,
+          state_code: settings?.state_code,
+          client_state_code: "", // TODO: add client state input
         }),
       });
 
@@ -136,6 +137,7 @@ export default function GeneratePage() {
       setResult({
         ...data,
         documentNumber: docNumber,
+        isDemo: data.provider === "mock",
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -478,6 +480,13 @@ export default function GeneratePage() {
                   </span>
                 </div>
               </div>
+
+              {/* Demo mode banner */}
+              {result.isDemo && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 text-sm text-amber-300 mt-4">
+                  ⚡ <strong>Demo Mode</strong> — This is sample data. Add your Gemini or Groq API key in <code className="bg-white/5 px-1.5 py-0.5 rounded text-xs">.env.local</code> for real AI generation.
+                </div>
+              )}
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={handleReset}
@@ -553,6 +562,7 @@ function InvoicePreview({
       <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
         <div>
           {settings?.logo_base64 && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={settings.logo_base64} alt="Logo" className="h-10 mb-2 rounded" />
           )}
           <h3 className="text-xl font-bold text-white mb-0.5">
@@ -671,6 +681,7 @@ function ProposalPreview({
     <div>
       <div className="text-center mb-8 pb-6 border-b border-white/10">
         {settings?.logo_base64 && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={settings.logo_base64} alt="Logo" className="h-10 mx-auto mb-3 rounded" />
         )}
         <span className="inline-block bg-amber-500/15 text-amber-400 text-xs font-medium px-3 py-1.5 rounded-full mb-3">

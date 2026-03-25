@@ -12,6 +12,7 @@ interface PricingCardProps {
   ctaText?: string;
   ctaHref?: string;
   onCta?: () => void;
+  disabled?: boolean;
 }
 
 export default function PricingCard({
@@ -23,6 +24,7 @@ export default function PricingCard({
   ctaText = "Get Started",
   ctaHref,
   onCta,
+  disabled,
 }: PricingCardProps) {
   const buttonClasses = cn(
     "w-full py-3 rounded-xl text-sm font-semibold transition-all text-center block",
@@ -75,7 +77,11 @@ export default function PricingCard({
         ))}
       </div>
 
-      {ctaHref ? (
+      {disabled ? (
+        <span className="w-full py-3 rounded-xl text-sm font-semibold text-center block bg-gray-800 text-gray-500 cursor-not-allowed">
+          {ctaText}
+        </span>
+      ) : ctaHref ? (
         <Link href={ctaHref} className={buttonClasses}>
           {ctaText}
         </Link>

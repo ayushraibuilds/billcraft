@@ -146,3 +146,68 @@ export function getMonthlyUsage(): number {
     return 0;
   }
 }
+
+// ── Export / Import ──
+export interface BillCraftExport {
+  version: 1;
+  exported_at: string;
+  settings: BusinessSettings;
+  documents: SavedDocument[];
+  doc_counters: { invoice: number; proposal: number };
+}
+
+export function exportAllData(): BillCraftExport {
+  const settings = getSettings();
+  const documents = getDocuments();
+  let docCounters = { invoice: 0, proposal: 0 };
+  try {
+    const raw = localStorage.getItem(DOC_COUNTER_KEY);
+    if (raw) docCounters = JSON.parse(raw);
+  } catch { /* empty */ }
+
+  return {
+    version: 1,
+    exported_at: new Date().toISOString(),
+    settings,
+    documents,
+    doc_counters: docCounters,
+  };
+}
+
+export function importAllData(data: BillCraftExport): { imported: number; skipped: number } {
+  // Import settings (overwrite)
+  saveSettings(data.settings);
+
+  // Import documents (merge, skip duplicates by ID)
+  const existing = getDocuments();
+  const existingIds = new Set(existing.map((d) => d.id));
+  let imported = 0;
+  let skipped = 0;
+
+  for (const doc of data.documents) {
+    if (existingIds.has(doc.id)) {
+      skipped++;
+    } else {
+      existing.push(doc);
+      imported++;
+    }
+  }
+
+  // Sort newest first
+  existing.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(existing.slice(0, 200)));
+
+  // Import doc counters (take max of existing and imported)
+  try {
+    const raw = localStorage.getItem(DOC_COUNTER_KEY);
+    const current = raw ? JSON.parse(raw) : { invoice: 0, proposal: 0 };
+    const merged = {
+      invoice: Math.max(current.invoice || 0, data.doc_counters?.invoice || 0),
+      proposal: Math.max(current.proposal || 0, data.doc_counters?.proposal || 0),
+    };
+    localStorage.setItem(DOC_COUNTER_KEY, JSON.stringify(merged));
+  } catch { /* empty */ }
+
+  return { imported, skipped };
+}
+
