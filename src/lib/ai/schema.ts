@@ -32,6 +32,8 @@ export const invoiceOutputSchema = z.object({
   payment_terms: z.string().describe("Payment terms (e.g., 'Due on receipt', 'Net 15')"),
   due_date: z.string().optional().describe("Payment due date"),
   notes: z.string().optional().describe("Additional notes for the client"),
+  recurring_cadence: z.enum(["weekly", "monthly", "yearly"]).optional(),
+  recurring_next_date: z.string().optional(),
 });
 
 // ── Proposal Output ──
@@ -73,6 +75,8 @@ export const proposalOutputSchema = z.object({
   ).optional().describe("Payment milestone schedule"),
   validity: z.string().default("15 days").describe("Proposal validity period"),
   terms_and_conditions: z.array(z.string()).describe("Key terms and conditions"),
+  recurring_cadence: z.enum(["weekly", "monthly", "yearly"]).optional(),
+  recurring_next_date: z.string().optional(),
 });
 
 // ── Input Schema ──

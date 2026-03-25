@@ -108,15 +108,15 @@ export function saveDocument(doc: SavedDocument): void {
   localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(docs.slice(0, 100)));
 }
 
-export function updateDocumentStatus(
+export function updateDocument(
   id: string,
-  status: SavedDocument["status"]
+  updates: Partial<SavedDocument>
 ): void {
   if (typeof window === "undefined") return;
   const docs = getDocuments();
   const idx = docs.findIndex((d) => d.id === id);
   if (idx !== -1) {
-    docs[idx].status = status;
+    docs[idx] = { ...docs[idx], ...updates };
     localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(docs));
   }
 }

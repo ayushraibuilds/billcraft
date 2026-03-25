@@ -11,14 +11,20 @@ import {
   IndianRupee,
   BarChart3,
   Cloud,
+  Repeat,
+  Loader2,
 } from "lucide-react";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import {
   getDocuments,
   getMonthlyUsage,
+  saveDocument,
+  updateDocument,
   type SavedDocument,
 } from "@/lib/store";
-import { getAuthUserId, mergeLocalAndCloud } from "@/lib/supabase/sync";
+import { getAuthUserId, mergeLocalAndCloud, syncDocumentToCloud } from "@/lib/supabase/sync";
+import { useToast } from "@/components/Toast";
+import type { InvoiceOutput, ProposalOutput } from "@/lib/ai/schema";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-gray-500/15 text-gray-400",
@@ -33,11 +39,14 @@ export default function DashboardPage() {
     return getDocuments();
   });
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "sent" | "paid" | "overdue">("all");
   const [monthlyUsage] = useState(() => {
     if (typeof window === "undefined") return 0;
     return getMonthlyUsage();
   });
   const [syncing, setSyncing] = useState(false);
+  const [generatingRecurring, setGeneratingRecurring] = useState(false);
+  const { toast } = useToast();
 
   const syncCloud = useCallback(async () => {
     const userId = await getAuthUserId();
@@ -62,11 +71,64 @@ export default function DashboardPage() {
     syncCloud();
   }, [syncCloud]);
 
-  const filtered = documents.filter(
-    (doc) =>
-      doc.client_name.toLowerCase().includes(search.toLowerCase()) ||
-      doc.document_number.toLowerCase().includes(search.toLowerCase())
-  );
+  const dueRecurring = documents.filter((doc) => {
+    const data = doc.output_json as Record<string, unknown>;
+    if (!data.recurring_cadence || !data.recurring_next_date) return false;
+    return new Date(data.recurring_next_date as string) <= new Date();
+  });
+
+  const handleGenerateDueRecurring = async () => {
+    setGeneratingRecurring(true);
+    const userId = await getAuthUserId();
+    const newDocs: SavedDocument[] = [];
+    
+    for (const oldDoc of dueRecurring) {
+      const data = oldDoc.output_json as Record<string, unknown>;
+      const cadence = data.recurring_cadence as "weekly" | "monthly" | "yearly";
+      
+      const nextDate = new Date();
+      if (cadence === "weekly") nextDate.setDate(nextDate.getDate() + 7);
+      if (cadence === "monthly") nextDate.setMonth(nextDate.getMonth() + 1);
+      if (cadence === "yearly") nextDate.setFullYear(nextDate.getFullYear() + 1);
+      
+      const newId = crypto.randomUUID();
+      const newDocNumber = `INV-${Date.now().toString().slice(-6)}`;
+      const newOutputJson = { ...data, recurring_next_date: nextDate.toISOString() } as unknown as InvoiceOutput | ProposalOutput;
+      
+      const newDoc: SavedDocument = {
+        ...oldDoc,
+        id: newId,
+        document_number: newDocNumber,
+        created_at: new Date().toISOString(),
+        status: "draft",
+        output_json: newOutputJson
+      };
+      
+      const oldDocUpdatedData = { ...data };
+      delete oldDocUpdatedData.recurring_cadence;
+      delete oldDocUpdatedData.recurring_next_date;
+      const cleanOldOutput = oldDocUpdatedData as unknown as InvoiceOutput | ProposalOutput;
+      
+      updateDocument(oldDoc.id, { output_json: cleanOldOutput });
+      saveDocument(newDoc);
+      newDocs.push(newDoc);
+      
+      if (userId) {
+         syncDocumentToCloud(userId, newDoc);
+         syncDocumentToCloud(userId, { ...oldDoc, output_json: cleanOldOutput });
+      }
+    }
+    
+    setDocuments(getDocuments());
+    setGeneratingRecurring(false);
+    toast(`Generated ${newDocs.length} recurring documents`, "success");
+  };
+
+  const filtered = documents.filter((doc) => {
+    const matchesSearch = doc.client_name.toLowerCase().includes(search.toLowerCase()) || doc.document_number.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const totalBilled = documents.reduce((sum, d) => sum + d.amount, 0);
   const paidCount = documents.filter((d) => d.status === "paid").length;
@@ -165,17 +227,57 @@ export default function DashboardPage() {
             <BarChart3 className="w-5 h-5 text-amber-500/60" />
             Recent Documents
           </h2>
-          <div className="relative w-full sm:w-auto">
-            <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-white/5 border border-white/5 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-gray-600 w-full sm:w-56 focus:outline-none focus:border-amber-500/30"
-            />
+          <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+            {/* Filter Tabs */}
+            <div className="flex bg-white/5 rounded-xl p-1 shrink-0">
+              {["all", "draft", "sent", "paid", "overdue"].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status as "all" | "draft" | "sent" | "paid" | "overdue")}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize",
+                    statusFilter === status 
+                      ? "bg-amber-500 text-dark-900" 
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+            
+            <div className="relative shrink-0">
+              <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-white/5 border border-white/5 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-gray-600 w-48 focus:outline-none focus:border-amber-500/30 transition-all focus:w-56"
+              />
+            </div>
           </div>
         </div>
+
+        {/* Recurring Alert */}
+        {dueRecurring.length > 0 && (
+          <div className="mb-6 p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card">
+            <div>
+              <h3 className="text-amber-400 font-semibold flex items-center gap-2 mb-1">
+                <Repeat className="w-5 h-5" /> {dueRecurring.length} Recurring {dueRecurring.length === 1 ? "Invoice" : "Invoices"} Due
+              </h3>
+              <p className="text-sm text-amber-500/80">These documents are scheduled to be generated today.</p>
+            </div>
+            <button 
+              onClick={handleGenerateDueRecurring} 
+              disabled={generatingRecurring}
+              className="btn-primary flex items-center justify-center gap-2 text-sm whitespace-nowrap min-w-[160px]"
+            >
+              {generatingRecurring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} 
+              {generatingRecurring ? "Generating..." : "Generate All Now"}
+            </button>
+          </div>
+        )}
 
         {filtered.length > 0 ? (
           <div className="space-y-3">
