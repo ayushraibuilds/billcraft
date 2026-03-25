@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -10,39 +11,14 @@ import {
   Clock,
   IndianRupee,
   BarChart3,
+  Trash2,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-
-// Mock data for demo
-const MOCK_DOCUMENTS = [
-  {
-    id: "1",
-    type: "invoice",
-    client_name: "Rohit Sharma",
-    document_number: "INV-2026-001",
-    amount: 45000,
-    status: "sent",
-    created_at: "2026-03-24",
-  },
-  {
-    id: "2",
-    type: "proposal",
-    client_name: "Priya Kapoor",
-    document_number: "PROP-2026-001",
-    amount: 120000,
-    status: "draft",
-    created_at: "2026-03-23",
-  },
-  {
-    id: "3",
-    type: "invoice",
-    client_name: "Ankit Tech Solutions",
-    document_number: "INV-2026-002",
-    amount: 80000,
-    status: "paid",
-    created_at: "2026-03-20",
-  },
-];
+import { formatCurrency, formatDate } from "@/lib/utils";
+import {
+  getDocuments,
+  getMonthlyUsage,
+  type SavedDocument,
+} from "@/lib/store";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-gray-500/15 text-gray-400",
@@ -52,6 +28,24 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function DashboardPage() {
+  const [documents, setDocuments] = useState<SavedDocument[]>([]);
+  const [search, setSearch] = useState("");
+  const [monthlyUsage, setMonthlyUsage] = useState(0);
+
+  useEffect(() => {
+    setDocuments(getDocuments());
+    setMonthlyUsage(getMonthlyUsage());
+  }, []);
+
+  const filtered = documents.filter(
+    (doc) =>
+      doc.client_name.toLowerCase().includes(search.toLowerCase()) ||
+      doc.document_number.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalBilled = documents.reduce((sum, d) => sum + d.amount, 0);
+  const paidCount = documents.filter((d) => d.status === "paid").length;
+
   return (
     <main className="min-h-screen bg-dark-900">
       {/* Header */}
@@ -66,7 +60,10 @@ export default function DashboardPage() {
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/settings" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <Link
+              href="/settings"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
               Settings
             </Link>
             <Link
@@ -83,23 +80,49 @@ export default function DashboardPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
-          <p className="text-sm text-gray-500">Your documents and billing overview</p>
+          <p className="text-sm text-gray-500">
+            Your documents and billing overview
+          </p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {[
-            { label: "Documents This Month", value: "2", icon: FileText, sub: "of 3 free" },
-            { label: "Total Billed", value: formatCurrency(245000), icon: IndianRupee, sub: "all time" },
-            { label: "Avg. Generation Time", value: "~8s", icon: Clock, sub: "per document" },
-            { label: "Conversion Rate", value: "67%", icon: TrendingUp, sub: "proposals → invoices" },
+            {
+              label: "This Month",
+              value: String(monthlyUsage),
+              icon: FileText,
+              sub: "of 3 free",
+            },
+            {
+              label: "Total Billed",
+              value: formatCurrency(totalBilled),
+              icon: IndianRupee,
+              sub: `${documents.length} documents`,
+            },
+            {
+              label: "Paid",
+              value: String(paidCount),
+              icon: TrendingUp,
+              sub: documents.length
+                ? `${Math.round((paidCount / documents.length) * 100)}% rate`
+                : "no documents yet",
+            },
+            {
+              label: "Invoices vs Proposals",
+              value: `${documents.filter((d) => d.type === "invoice").length} / ${documents.filter((d) => d.type === "proposal").length}`,
+              icon: BarChart3,
+              sub: "invoice / proposal",
+            },
           ].map((stat, i) => (
             <div key={i} className="glass-card p-5">
               <div className="flex items-start justify-between mb-3">
                 <span className="text-xs text-gray-500">{stat.label}</span>
                 <stat.icon className="w-4 h-4 text-amber-500/60" />
               </div>
-              <p className="text-2xl font-bold text-white mb-0.5">{stat.value}</p>
+              <p className="text-2xl font-bold text-white mb-0.5">
+                {stat.value}
+              </p>
               <span className="text-xs text-gray-600">{stat.sub}</span>
             </div>
           ))}
@@ -116,68 +139,89 @@ export default function DashboardPage() {
             <input
               type="text"
               placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="bg-white/5 border border-white/5 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-gray-600 w-56 focus:outline-none focus:border-amber-500/30"
             />
           </div>
         </div>
 
-        <div className="space-y-3">
-          {MOCK_DOCUMENTS.map((doc) => (
-            <div
-              key={doc.id}
-              className="glass-card glass-card-hover p-5 flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-amber-400" />
+        {filtered.length > 0 ? (
+          <div className="space-y-3">
+            {filtered.map((doc) => (
+              <div
+                key={doc.id}
+                className="glass-card glass-card-hover p-5 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-sm font-semibold text-white">
+                        {doc.client_name}
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        {doc.document_number}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 capitalize">
+                        {doc.type}
+                      </span>
+                      <span className="text-xs text-gray-700">·</span>
+                      <span className="text-xs text-gray-500">
+                        {formatDate(new Date(doc.created_at))}
+                      </span>
+                      <span className="text-xs text-gray-700">·</span>
+                      <span className="text-xs text-gray-600 capitalize">
+                        {doc.service_category}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-semibold text-white">
-                      {doc.client_name}
-                    </span>
-                    <span className="text-xs text-gray-600">
-                      {doc.document_number}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 capitalize">
-                      {doc.type}
-                    </span>
-                    <span className="text-xs text-gray-700">·</span>
-                    <span className="text-xs text-gray-500">
-                      {doc.created_at}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-semibold text-white">
+                    {formatCurrency(doc.amount)}
+                  </span>
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[doc.status]}`}
+                  >
+                    {doc.status}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold text-white">
-                  {formatCurrency(doc.amount)}
-                </span>
-                <span
-                  className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[doc.status]}`}
-                >
-                  {doc.status}
-                </span>
-              </div>
+            ))}
+          </div>
+        ) : documents.length === 0 ? (
+          /* Empty state */
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-8 h-8 text-amber-400/60" />
             </div>
-          ))}
-        </div>
-
-        {/* Empty state CTA */}
-        <div className="text-center py-8">
-          <p className="text-sm text-gray-600 mb-3">
-            Create your first real document to see it here
-          </p>
-          <Link
-            href="/generate"
-            className="btn-primary inline-flex items-center gap-2 text-sm !py-2.5"
-          >
-            <Zap className="w-4 h-4" />
-            Generate Document
-          </Link>
-        </div>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              No documents yet
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Generate your first invoice or proposal to see it here
+            </p>
+            <Link
+              href="/generate"
+              className="btn-primary inline-flex items-center gap-2 text-sm"
+            >
+              <Zap className="w-4 h-4" />
+              Generate Your First Document
+            </Link>
+          </div>
+        ) : (
+          /* No search results */
+          <div className="text-center py-12">
+            <p className="text-sm text-gray-500">
+              No documents match &ldquo;{search}&rdquo;
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );

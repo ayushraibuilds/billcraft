@@ -41,6 +41,7 @@ export default function PricingPage() {
                 { text: "Email to client", included: false },
               ]}
               ctaText="Start Free"
+              ctaHref="/generate"
             />
             <PricingCard
               name="Pro"
@@ -58,6 +59,7 @@ export default function PricingPage() {
                 { text: "Client history + search", included: true },
               ]}
               ctaText="Get Pro — ₹199/mo"
+              ctaHref="/generate"
             />
             <PricingCard
               name="Agency"
@@ -74,6 +76,7 @@ export default function PricingPage() {
                 { text: "API access", included: true },
               ]}
               ctaText="Contact for Agency"
+              ctaHref="mailto:hello@billcraft.in?subject=Agency%20Plan%20Inquiry"
             />
           </div>
 

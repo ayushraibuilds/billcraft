@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface PricingCardProps {
@@ -9,6 +10,7 @@ interface PricingCardProps {
   features: { text: string; included: boolean }[];
   popular?: boolean;
   ctaText?: string;
+  ctaHref?: string;
   onCta?: () => void;
 }
 
@@ -19,8 +21,14 @@ export default function PricingCard({
   features,
   popular,
   ctaText = "Get Started",
+  ctaHref,
   onCta,
 }: PricingCardProps) {
+  const buttonClasses = cn(
+    "w-full py-3 rounded-xl text-sm font-semibold transition-all text-center block",
+    popular ? "btn-primary" : "btn-secondary"
+  );
+
   return (
     <div
       className={cn(
@@ -67,17 +75,15 @@ export default function PricingCard({
         ))}
       </div>
 
-      <button
-        onClick={onCta}
-        className={cn(
-          "w-full py-3 rounded-xl text-sm font-semibold transition-all",
-          popular
-            ? "btn-primary"
-            : "btn-secondary"
-        )}
-      >
-        {ctaText}
-      </button>
+      {ctaHref ? (
+        <Link href={ctaHref} className={buttonClasses}>
+          {ctaText}
+        </Link>
+      ) : (
+        <button onClick={onCta} className={buttonClasses}>
+          {ctaText}
+        </button>
+      )}
     </div>
   );
 }
