@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { getDocuments, type SavedDocument } from "@/lib/store";
 import type { InvoiceOutput } from "@/lib/ai/schema";
 import Navbar from "@/components/Navbar";
@@ -8,11 +8,10 @@ import { BarChart3, Download, TrendingUp, Receipt, Building2 } from "lucide-reac
 import { formatCurrency } from "@/lib/utils";
 
 export default function ReportsPage() {
-  const [documents, setDocuments] = useState<SavedDocument[]>([]);
-
-  useEffect(() => {
-    setDocuments(getDocuments());
-  }, []);
+  const [documents] = useState<SavedDocument[]>(() => {
+    if (typeof window === "undefined") return [];
+    return getDocuments();
+  });
 
   // Filter only invoices that are not drafts
   const validInvoices = useMemo(() => {

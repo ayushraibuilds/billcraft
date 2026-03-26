@@ -11,6 +11,7 @@ import {
   Download,
   FileUp,
   FileText,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, saveSettings, exportAllData, importAllData, type BusinessSettings, type BillCraftExport } from "@/lib/store";
@@ -179,6 +180,68 @@ export default function SettingsPage() {
               placeholder="1" 
               type="number" 
             />
+          </div>
+        </section>
+
+        {/* Document Theme */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-5">
+            <Palette className="w-4 h-4 text-amber-500" />
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Document Theme
+            </h2>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            Select a visual aesthetic for your generated PDFs and client emails.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {(["standard", "modern", "creative", "legal"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => handleChange("theme", t)}
+                className={`p-4 rounded-xl border flex flex-col items-center gap-3 transition-colors ${
+                  formData.theme === t
+                    ? "border-amber-500 bg-amber-500/10 text-amber-400 shadow-sm shadow-amber-500/20"
+                    : "border-white/10 bg-white/[0.02] text-gray-400 hover:border-white/20 hover:bg-white/5"
+                }`}
+              >
+                <div className="h-16 w-full rounded bg-[#111] border border-white/10 overflow-hidden flex flex-col mb-1 relative">
+                  {t === "standard" && (
+                    <div className="p-2 w-full h-full flex flex-col gap-1 items-start bg-white">
+                      <div className="w-1/2 h-1 bg-gray-600 rounded-sm"></div>
+                      <div className="w-1/3 h-1 bg-gray-400 rounded-sm"></div>
+                      <div className="mt-1 w-full h-px bg-gray-300"></div>
+                      <div className="mt-auto w-full h-2 bg-gray-200 rounded-sm"></div>
+                    </div>
+                  )}
+                  {t === "modern" && (
+                    <div className="w-full h-full flex flex-col gap-1 relative overflow-hidden bg-slate-50">
+                      <div className="absolute top-0 right-0 w-8 h-8 rounded-bl-xl bg-indigo-500 opacity-20"></div>
+                      <div className="p-2 z-10">
+                        <div className="w-1/3 h-2 bg-indigo-500 rounded-full mb-1"></div>
+                        <div className="w-1/4 h-1 bg-slate-400 rounded-full"></div>
+                        <div className="mt-2 w-full h-2 bg-indigo-100 rounded-lg"></div>
+                      </div>
+                    </div>
+                  )}
+                  {t === "creative" && (
+                    <div className="p-2 w-full h-full flex flex-col gap-1 items-center bg-[#fdfbf7] justify-center border-4 border-white">
+                      <div className="w-4 h-4 rounded-full border border-amber-600/30"></div>
+                      <div className="w-1/2 h-0.5 bg-gray-400 mt-1"></div>
+                      <div className="w-1/3 h-0.5 bg-gray-300"></div>
+                    </div>
+                  )}
+                  {t === "legal" && (
+                    <div className="p-2 w-full h-full flex flex-col gap-1 bg-white border-x-4 border-double border-gray-400">
+                      <div className="w-full h-1 border-b-2 border-double border-black"></div>
+                      <div className="mt-1 w-full flex justify-between"><div className="w-1/4 h-0.5 bg-gray-400"></div><div className="w-1/4 h-0.5 bg-gray-400"></div></div>
+                      <div className="mt-auto w-full h-0.5 bg-black"></div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs font-semibold capitalize tracking-wide">{t}</div>
+              </button>
+            ))}
           </div>
         </section>
 

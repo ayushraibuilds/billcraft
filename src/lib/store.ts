@@ -29,6 +29,7 @@ export interface BusinessSettings {
   default_payment_terms: string;
   document_prefix?: string;
   document_sequence?: number;
+  theme?: "standard" | "modern" | "creative" | "legal";
 }
 
 export interface SavedDocument {
@@ -89,6 +90,7 @@ function getDefaultSettings(): BusinessSettings {
     default_payment_terms: "Due on receipt",
     document_prefix: "INV-",
     document_sequence: 1,
+    theme: "standard",
   };
 }
 
