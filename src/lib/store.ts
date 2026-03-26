@@ -30,6 +30,7 @@ export interface BusinessSettings {
   document_prefix?: string;
   document_sequence?: number;
   theme?: "standard" | "modern" | "creative" | "legal";
+  plan?: "free" | "pro" | "agency";
 }
 
 export interface SavedDocument {
@@ -48,10 +49,10 @@ export interface SavedDocument {
 }
 
 // ── Keys ──
-const SETTINGS_KEY = "billcraft_settings";
-const DOCUMENTS_KEY = "billcraft_documents";
-const CLIENTS_KEY = "billcraft_clients";
-const DOC_COUNTER_KEY = "billcraft_doc_counter";
+const SETTINGS_KEY = "invosmith_settings";
+const DOCUMENTS_KEY = "invosmith_documents";
+const CLIENTS_KEY = "invosmith_clients";
+const DOC_COUNTER_KEY = "invosmith_doc_counter";
 
 // ── Settings ──
 export function getSettings(): BusinessSettings {
@@ -91,6 +92,7 @@ function getDefaultSettings(): BusinessSettings {
     document_prefix: "INV-",
     document_sequence: 1,
     theme: "standard",
+    plan: "free",
   };
 }
 
@@ -206,7 +208,7 @@ export function getMonthlyUsage(): number {
 }
 
 // ── Export / Import ──
-export interface BillCraftExport {
+export interface InvosmithExport {
   version: 1;
   exported_at: string;
   settings: BusinessSettings;
@@ -215,7 +217,7 @@ export interface BillCraftExport {
   doc_counters: { invoice: number; proposal: number };
 }
 
-export function exportAllData(): BillCraftExport {
+export function exportAllData(): InvosmithExport {
   const settings = getSettings();
   const documents = getDocuments();
   let docCounters = { invoice: 0, proposal: 0 };
@@ -234,7 +236,7 @@ export function exportAllData(): BillCraftExport {
   };
 }
 
-export function importAllData(data: BillCraftExport): { imported: number; skipped: number } {
+export function importAllData(data: InvosmithExport): { imported: number; skipped: number } {
   // Import settings (overwrite)
   saveSettings(data.settings);
 

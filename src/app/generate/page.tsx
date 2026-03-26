@@ -34,6 +34,7 @@ import { INDIAN_STATES } from "@/lib/constants";
 import EditableDocumentPreview from "@/components/EditableDocumentPreview";
 import { buildHTML } from "@/lib/html-template";
 import { useRouter } from "next/navigation";
+import UpgradeModal from "@/components/UpgradeModal";
 
 const CATEGORIES = [
   { value: "designer", label: "Designer", icon: Palette },
@@ -79,6 +80,7 @@ export default function GeneratePage() {
   const [previewDoc, setPreviewDoc] = useState<SavedDocument | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string>("new");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const router = useRouter();
 
@@ -94,8 +96,8 @@ export default function GeneratePage() {
       return;
     }
 
-    if (monthlyUsage >= FREE_LIMIT) {
-      setError(`Free tier limit reached (${FREE_LIMIT}/month). Upgrade to Pro for unlimited.`);
+    if (monthlyUsage >= FREE_LIMIT && settings?.plan !== "pro" && settings?.plan !== "agency") {
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -257,6 +259,11 @@ export default function GeneratePage() {
   return (
     <main className="min-h-screen bg-dark-900">
       <Navbar />
+      
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
 
       <div className="mx-auto max-w-5xl px-6 pt-24 pb-10">
         {previewDoc ? (

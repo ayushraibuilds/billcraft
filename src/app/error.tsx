@@ -12,7 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("BillCraft error:", error);
+    console.error("Invosmith error:", error);
   }, [error]);
 
   return (

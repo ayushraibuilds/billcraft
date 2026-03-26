@@ -69,7 +69,7 @@ export default function Footer() {
 
         <div className="border-t border-white/5 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} BillCraft. Made with ❤️ for Indian
+            © {new Date().getFullYear()} Invosmith. Made with ❤️ for Indian
             freelancers.
           </p>
           <p className="text-xs text-gray-600">

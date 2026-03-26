@@ -1,6 +1,6 @@
 {
-  "name": "BillCraft",
-  "short_name": "BillCraft",
+  "name": "Invosmith",
+  "short_name": "Invosmith",
   "description": "AI Invoice & Proposal Generator for Indian Freelancers",
   "start_url": "/",
   "display": "standalone",

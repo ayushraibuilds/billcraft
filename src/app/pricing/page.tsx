@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 
 export const metadata = {
-  title: "Pricing — BillCraft",
+  title: "Pricing — Invosmith",
   description: "Simple, freelancer-friendly pricing. Start free, upgrade when ready.",
 };
 
@@ -19,7 +19,7 @@ export default function PricingPage() {
               Simple, transparent pricing
             </h1>
             <p className="text-gray-400 max-w-lg mx-auto">
-              BillCraft is currently in <span className="text-amber-400 font-medium">free beta</span>. All features are available at no cost while we refine the product.
+              Invosmith is currently in <span className="text-amber-400 font-medium">free beta</span>. All features are available at no cost while we refine the product.
             </p>
           </div>
 

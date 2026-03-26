@@ -72,7 +72,7 @@ export default function HomePage() {
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="text-xs text-gray-500 ml-2">BillCraft</span>
+              <span className="text-xs text-gray-500 ml-2">Invosmith</span>
             </div>
             <div className="bg-dark-700 rounded-xl p-4 mb-3">
               <p className="text-sm text-gray-500 mb-2 text-left">Your input:</p>
@@ -268,7 +268,7 @@ export default function HomePage() {
               Simple, freelancer-friendly pricing
             </h2>
             <p className="text-gray-400 max-w-lg mx-auto">
-              BillCraft is currently in <span className="text-amber-400 font-medium">free beta</span>. All features are available at no cost while we refine the product.
+              Invosmith is currently in <span className="text-amber-400 font-medium">free beta</span>. All features are available at no cost while we refine the product.
             </p>
           </div>
 
@@ -334,7 +334,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-white mb-3">
-              Why BillCraft?
+              Why Invosmith?
             </h2>
             <p className="text-gray-400 text-sm">
               Compare with the alternatives Indian freelancers actually use
@@ -354,7 +354,7 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {[
-                  { name: "BillCraft", price: "Free Beta", ai: true, gst: true, proposals: true, highlight: true },
+                  { name: "Invosmith", price: "Free Beta", ai: true, gst: true, proposals: true, highlight: true },
                   { name: "Zoho Invoice", price: "₹750/mo", ai: false, gst: true, proposals: false },
                   { name: "FreshBooks", price: "₹2,000/mo", ai: false, gst: false, proposals: true },
                   { name: "Invoice Ninja", price: "Free/₹800", ai: false, gst: false, proposals: true },

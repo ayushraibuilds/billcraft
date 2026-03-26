@@ -9,7 +9,7 @@ export default function GenerateLoading() {
         </div>
         <div className="flex items-center gap-2 justify-center">
           <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
-          <span className="text-sm text-gray-400">Loading BillCraft...</span>
+          <span className="text-sm text-gray-400">Loading Invosmith...</span>
         </div>
       </div>
     </div>

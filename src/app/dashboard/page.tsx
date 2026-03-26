@@ -60,7 +60,7 @@ export default function DashboardPage() {
       setDocuments(merged);
       // Also persist merged list to localStorage
       if (typeof window !== "undefined") {
-        localStorage.setItem("billcraft_documents", JSON.stringify(merged.slice(0, 200)));
+        localStorage.setItem("invosmith_documents", JSON.stringify(merged.slice(0, 200)));
       }
     } catch (e) {
       console.error("Cloud sync error:", e);

@@ -65,7 +65,7 @@ function LoginForm() {
       <div className="text-center mb-8">
         <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold text-white mb-2">
           <Zap className="w-6 h-6 text-amber-400" />
-          BillCraft
+          Invosmith
         </Link>
         <p className="text-sm text-gray-500">
           {mode === "login" ? "Welcome back" : "Create your account"}

@@ -50,7 +50,7 @@ export default async function SharedDocumentPage({
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
               <FileText className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">BillCraft</span>
+            <span className="text-lg font-bold text-white">Invosmith</span>
           </div>
           <div className="text-sm font-medium text-white px-3 py-1.5 bg-white/10 rounded-full">
             {document.document_number}

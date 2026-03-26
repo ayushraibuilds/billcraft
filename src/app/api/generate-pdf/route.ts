@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="Document_${document_number || "BillCraft"}.pdf"`,
+        "Content-Disposition": `attachment; filename="Document_${document_number || "Invosmith"}.pdf"`,
       },
     });
   } catch (error) {

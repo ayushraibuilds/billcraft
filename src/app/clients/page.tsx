@@ -40,7 +40,7 @@ export default function ClientsPage() {
       const merged = await mergeLocalAndCloudClients(userId, getClients());
       setClients(merged);
       if (typeof window !== "undefined") {
-        localStorage.setItem("billcraft_clients", JSON.stringify(merged));
+        localStorage.setItem("invosmith_clients", JSON.stringify(merged));
       }
     } catch (e) {
       console.error("Cloud sync error:", e);

@@ -1,4 +1,4 @@
-export const APP_NAME = "BillCraft";
+export const APP_NAME = "Invosmith";
 export const APP_TAGLINE = "AI Invoice & Proposal Generator for Indian Freelancers";
 export const APP_DESCRIPTION =
   "Paste your messy project notes → get a professional, GST-compliant invoice or proposal PDF in 60 seconds.";

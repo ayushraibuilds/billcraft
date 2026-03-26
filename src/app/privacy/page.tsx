@@ -2,8 +2,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Privacy Policy — BillCraft",
-  description: "BillCraft privacy policy — how we handle your data.",
+  title: "Privacy Policy — Invosmith",
+  description: "Invosmith privacy policy — how we handle your data.",
 };
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
           <div className="space-y-8 text-sm text-gray-300 leading-relaxed">
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">What We Collect</h2>
-              <p>BillCraft collects only the minimum data needed to provide the service:</p>
+              <p>Invosmith collects only the minimum data needed to provide the service:</p>
               <ul className="list-disc pl-6 mt-2 space-y-1 text-gray-400">
                 <li>Business details you enter in Settings (name, GSTIN, address, bank info) — stored in your browser only</li>
                 <li>Document data you generate (invoices, proposals, client names, amounts) — stored in your browser only</li>
@@ -48,12 +48,12 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">Your Rights</h2>
-              <p>You can delete all your data at any time by clearing your browser&apos;s localStorage or using the export/import feature in Settings. For any questions, contact us at <span className="text-amber-400">hello@billcraft.in</span>.</p>
+              <p>You can delete all your data at any time by clearing your browser&apos;s localStorage or using the export/import feature in Settings. For any questions, contact us at <span className="text-amber-400">hello@invosmith.in</span>.</p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-white mb-3">Contact</h2>
-              <p>Questions? Email us at <span className="text-amber-400">hello@billcraft.in</span></p>
+              <p>Questions? Email us at <span className="text-amber-400">hello@invosmith.in</span></p>
             </section>
           </div>
         </div>

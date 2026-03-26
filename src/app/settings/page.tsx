@@ -14,7 +14,7 @@ import {
   Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSettings, saveSettings, exportAllData, importAllData, type BusinessSettings, type BillCraftExport } from "@/lib/store";
+import { getSettings, saveSettings, exportAllData, importAllData, type BusinessSettings, type InvosmithExport } from "@/lib/store";
 import { getAuthUserId, syncSettingsToCloud } from "@/lib/supabase/sync";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/components/Toast";
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `billcraft-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `invosmith-backup-${new Date().toISOString().slice(0, 10)}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
                 toast("Backup downloaded", "success");
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                   const reader = new FileReader();
                   reader.onload = (ev) => {
                     try {
-                      const data = JSON.parse(ev.target?.result as string) as BillCraftExport;
+                      const data = JSON.parse(ev.target?.result as string) as InvosmithExport;
                       if (data.version !== 1 || !data.settings || !data.documents) {
                         toast("Invalid backup file", "error");
                         return;

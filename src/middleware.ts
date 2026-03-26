@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // BillCraft is a local-first application.
+  // Invosmith is a local-first application.
   // We do NOT block unauthenticated users from using core routes 
   // (/generate, /dashboard, /settings, /reports) since they rely on localStorage.
   // The session is merely refreshed here so that Server Components 
