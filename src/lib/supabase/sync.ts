@@ -37,6 +37,9 @@ export async function syncSettingsToCloud(
     bank_name: settings.bank_name,
     upi_id: settings.upi_id,
     default_payment_terms: settings.default_payment_terms,
+    document_prefix: settings.document_prefix,
+    document_sequence: settings.document_sequence,
+    theme: settings.theme,
     // Note: logo_base64 is NOT stored in Supabase (too large, use Storage bucket later)
   });
 
@@ -76,6 +79,9 @@ export async function fetchCloudSettings(
     bank_name: data.bank_name || "",
     upi_id: data.upi_id || "",
     default_payment_terms: data.default_payment_terms || "Due on receipt",
+    document_prefix: data.document_prefix || "INV-",
+    document_sequence: data.document_sequence || 1,
+    theme: data.theme || "standard",
   };
 }
 
