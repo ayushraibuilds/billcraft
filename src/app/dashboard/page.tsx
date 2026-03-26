@@ -13,6 +13,8 @@ import {
   Cloud,
   Repeat,
   Loader2,
+  BellRing,
+  Mail,
 } from "lucide-react";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import {
@@ -76,6 +78,49 @@ export default function DashboardPage() {
     if (!data.recurring_cadence || !data.recurring_next_date) return false;
     return new Date(data.recurring_next_date as string) <= new Date();
   });
+
+  const dueReminders = documents.filter((doc) => {
+    if (doc.type !== "invoice" || doc.status !== "sent") return false;
+    const data = doc.output_json as Record<string, unknown>;
+    if (!data.due_date) return false;
+    // Remind if overdue (due_date in the past)
+    return new Date(data.due_date as string) < new Date();
+  });
+
+  const [sendingReminders, setSendingReminders] = useState(false);
+
+  const handleSendReminders = async () => {
+    setSendingReminders(true);
+    let sentCount = 0;
+    try {
+      for (const inv of dueReminders) {
+        const data = inv.output_json as Record<string, unknown>;
+        if (!data.client_email) continue;
+        
+        await fetch("/api/send-email", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({
+              to: data.client_email,
+              subject: `Invoice ${inv.document_number} from ${inv.client_name}`,
+              document_number: inv.document_number,
+              client_name: inv.client_name,
+              html_content: `<p>Please find attached the invoice <strong>${inv.document_number}</strong> for <strong>₹${inv.amount.toLocaleString("en-IN")}</strong>. It is currently overdue.</p>`,
+              pdf_data: data,
+              business_info: {}, // Would pass settings here if loaded
+              is_reminder: true
+           }),
+        });
+        updateDocument(inv.id, { status: "overdue" });
+        sentCount++;
+      }
+      setDocuments(getDocuments());
+      toast(`Sent ${sentCount} reminders`, "success");
+    } catch {
+      toast("Error sending reminders", "error");
+    }
+    setSendingReminders(false);
+  };
 
   const handleGenerateDueRecurring = async () => {
     setGeneratingRecurring(true);
@@ -275,6 +320,26 @@ export default function DashboardPage() {
             >
               {generatingRecurring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} 
               {generatingRecurring ? "Generating..." : "Generate All Now"}
+            </button>
+          </div>
+        )}
+
+        {/* Due Reminders Alert */}
+        {dueReminders.length > 0 && (
+          <div className="mb-6 p-5 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card">
+            <div>
+              <h3 className="text-rose-400 font-semibold flex items-center gap-2 mb-1">
+                <BellRing className="w-5 h-5" /> {dueReminders.length} Overdue {dueReminders.length === 1 ? "Invoice" : "Invoices"} Detected
+              </h3>
+              <p className="text-sm text-rose-500/80">These invoices have crossed their due date and have not been marked paid.</p>
+            </div>
+            <button 
+              onClick={handleSendReminders} 
+              disabled={sendingReminders}
+              className="bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-xl py-2 px-4 flex items-center justify-center gap-2 text-sm whitespace-nowrap min-w-[160px] transition-colors"
+            >
+              {sendingReminders ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />} 
+              {sendingReminders ? "Sending..." : "Send Reminders"}
             </button>
           </div>
         )}

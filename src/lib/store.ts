@@ -27,6 +27,8 @@ export interface BusinessSettings {
   upi_id: string;
   logo_base64: string;
   default_payment_terms: string;
+  document_prefix?: string;
+  document_sequence?: number;
 }
 
 export interface SavedDocument {
@@ -85,6 +87,8 @@ function getDefaultSettings(): BusinessSettings {
     upi_id: "",
     logo_base64: "",
     default_payment_terms: "Due on receipt",
+    document_prefix: "INV-",
+    document_sequence: 1,
   };
 }
 
@@ -165,8 +169,15 @@ export function deleteClient(id: string): boolean {
 
 // ── Document Counter ──
 export function getNextDocumentNumber(type: "invoice" | "proposal"): string {
-  if (typeof window === "undefined") return type === "invoice" ? "INV-2026-001" : "PROP-2026-001";
+  if (typeof window === "undefined") return type === "invoice" ? "INV-0001" : "PROP-0001";
   try {
+    const settings = getSettings();
+    if (settings.document_prefix && settings.document_sequence !== undefined) {
+      const generated = `${settings.document_prefix}${String(settings.document_sequence).padStart(4, "0")}`;
+      saveSettings({ document_sequence: settings.document_sequence + 1 });
+      return generated;
+    }
+
     const raw = localStorage.getItem(DOC_COUNTER_KEY);
     const counters = raw ? JSON.parse(raw) : { invoice: 0, proposal: 0 };
     counters[type] = (counters[type] || 0) + 1;
@@ -175,7 +186,7 @@ export function getNextDocumentNumber(type: "invoice" | "proposal"): string {
     const year = new Date().getFullYear();
     return `${prefix}-${year}-${String(counters[type]).padStart(3, "0")}`;
   } catch {
-    return type === "invoice" ? "INV-2026-001" : "PROP-2026-001";
+    return type === "invoice" ? "INV-0001" : "PROP-0001";
   }
 }
 

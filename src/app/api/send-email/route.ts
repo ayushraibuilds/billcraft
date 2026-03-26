@@ -35,7 +35,18 @@ export async function POST(request: NextRequest) {
     if (rateLimitResponse) return rateLimitResponse;
 
     const body = await request.json();
-    const { to, subject, document_number, client_name, html_content, pdf_data, business_info } = body;
+    const { to, subject, document_number, client_name, html_content, pdf_data, business_info, is_reminder } = body;
+
+    let finalSubject = subject;
+    let finalHtml = html_content;
+
+    if (is_reminder) {
+       finalSubject = `[Reminder] Action Required: ${subject}`;
+       finalHtml = `<div style="background-color: #fffbeb; padding: 16px; border-left: 4px solid #f59e0b; margin-bottom: 24px; color: #92400e; font-family: sans-serif;">
+            <p style="margin: 0; font-weight: 600;">Reminder Notice</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px;">This is an automated reminder regarding ${document_number} via BillCraft.</p>
+       </div>` + finalHtml;
+    }
 
     if (!to || !subject || !html_content) {
       return NextResponse.json(
@@ -61,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sanitizedContent = sanitizeHtml(html_content);
+    const sanitizedContent = sanitizeHtml(finalHtml);
 
     const resend = getResendClient();
 
@@ -94,7 +105,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: "BillCraft <noreply@billcraft.in>",
       to: [to],
-      subject: subject || `${document_number} from BillCraft`,
+      subject: finalSubject || `${document_number} from BillCraft`,
       html: `
         <div style="font-family:'Segoe UI',system-ui,sans-serif;max-width:600px;margin:0 auto;">
           <div style="background:#0a0a0a;padding:24px;border-radius:12px 12px 0 0;">

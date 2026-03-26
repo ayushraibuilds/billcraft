@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { FileText, Menu, X, Zap, LayoutDashboard, Settings, LogOut, User, Users } from "lucide-react";
+import { FileText, Menu, X, Zap, LayoutDashboard, Settings, LogOut, User, Users, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -67,6 +67,18 @@ export default function Navbar() {
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 Dashboard
+              </Link>
+              <Link
+                href="/reports"
+                className={cn(
+                  "text-sm transition-colors flex items-center gap-1.5",
+                  pathname === "/reports"
+                    ? "text-amber-400"
+                    : "text-gray-400 hover:text-white"
+                )}
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                Reports
               </Link>
               <Link
                 href="/generate"
@@ -186,6 +198,9 @@ export default function Navbar() {
               </Link>
               <Link href="/clients" className="flex items-center gap-2 text-sm text-gray-400 py-1" onClick={() => setIsOpen(false)}>
                 <Users className="w-4 h-4" /> Clients
+              </Link>
+              <Link href="/reports" className="flex items-center gap-2 text-sm text-gray-400 py-1" onClick={() => setIsOpen(false)}>
+                <BarChart3 className="w-4 h-4" /> Reports
               </Link>
               <Link href="/generate" className="block text-sm text-gray-400 py-1" onClick={() => setIsOpen(false)}>
                 Generate

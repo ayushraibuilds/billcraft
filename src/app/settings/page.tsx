@@ -10,6 +10,7 @@ import {
   X,
   Download,
   FileUp,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, saveSettings, exportAllData, importAllData, type BusinessSettings, type BillCraftExport } from "@/lib/store";
@@ -33,8 +34,8 @@ export default function SettingsPage() {
     return getSettings();
   });
 
-  const handleChange = (field: keyof BusinessSettings, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (field: keyof BusinessSettings, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value as never }));
     setSaved(false);
   };
 
@@ -150,6 +151,34 @@ export default function SettingsPage() {
                 </label>
               )}
             </div>
+          </div>
+        </section>
+
+        {/* Document Numbering */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-5">
+            <FileText className="w-4 h-4 text-amber-500" />
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">
+              Document Numbering
+            </h2>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            Customize the sequence format for all new invoices and proposals. The Sequence Number will auto-increment.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <InputField 
+              label="Document Prefix" 
+              value={formData.document_prefix || ""} 
+              onChange={(v) => handleChange("document_prefix", v)} 
+              placeholder="INV-" 
+            />
+            <InputField 
+              label="Next Sequence Number" 
+              value={formData.document_sequence?.toString() || ""} 
+              onChange={(v) => handleChange("document_sequence", parseInt(v) || 1)} 
+              placeholder="1" 
+              type="number" 
+            />
           </div>
         </section>
 

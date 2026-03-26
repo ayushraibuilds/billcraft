@@ -82,6 +82,17 @@ export default function EditableDocumentPreview({ document, onSave, onCancel }: 
     onSave(finalDoc);
   };
 
+  const getSafeDateStr = (raw?: string) => {
+    if (!raw) return "";
+    try {
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return "";
+      return d.toISOString().split("T")[0];
+    } catch {
+      return "";
+    }
+  };
+
   return (
     <div className="glass-card p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
@@ -100,7 +111,7 @@ export default function EditableDocumentPreview({ document, onSave, onCancel }: 
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Client Name</label>
             <input 
@@ -117,6 +128,17 @@ export default function EditableDocumentPreview({ document, onSave, onCancel }: 
               className="w-full bg-dark-700 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/40"
             />
           </div>
+          {isInvoice && (
+            <div>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Due Date</label>
+              <input 
+                type="date"
+                value={getSafeDateStr((data as InvoiceOutput).due_date)} 
+                onChange={(e) => handleTextChange("due_date" as keyof InvoiceOutput, e.target.value)}
+                className="w-full bg-dark-700 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500/40"
+              />
+            </div>
+          )}
         </div>
 
         <div>
