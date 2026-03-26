@@ -257,7 +257,10 @@ export default function GeneratePage() {
   const remaining = Math.max(0, FREE_LIMIT - monthlyUsage);
 
   return (
-    <main className="min-h-screen bg-dark-900">
+    <main className="min-h-screen bg-dark-900 relative selection:bg-amber-500/30">
+      {/* Cinematic Ambient Background Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-amber-500/10 blur-[150px] pointer-events-none rounded-full opacity-60" />
+
       <Navbar />
       
       <UpgradeModal 
@@ -265,7 +268,7 @@ export default function GeneratePage() {
         onClose={() => setShowUpgradeModal(false)} 
       />
 
-      <div className="mx-auto max-w-5xl px-6 pt-24 pb-10">
+      <div className="mx-auto max-w-5xl px-6 pt-24 pb-10 relative z-10">
         {previewDoc ? (
            <EditableDocumentPreview 
              document={previewDoc} 
@@ -274,56 +277,59 @@ export default function GeneratePage() {
            />
         ) : !result ? (
           /* ── Input Form ── */
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-10">
-              <h1 className="text-3xl font-bold text-white mb-3">
-                Generate your{" "}
+          <div className="max-w-4xl mx-auto glass-card p-8 sm:p-12 mb-16 relative group">
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-500/[0.02] to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            
+            <div className="text-center mb-12">
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+                Craft your{" "}
                 <span className="gradient-text">
                   {documentType === "invoice" ? "invoice" : "proposal"}
                 </span>
               </h1>
-              <p className="text-gray-400">
-                Describe your project in any language — we&apos;ll handle the
-                rest
+              <p className="text-gray-400 text-lg max-w-lg mx-auto leading-relaxed">
+                Describe your project using loose notes or keywords — we&apos;ll automatically structure, calculate, and format it.
               </p>
             </div>
 
             {/* Document Type Toggle */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              {(["invoice", "proposal"] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setDocumentType(type)}
-                  className={cn(
-                    "px-5 py-2.5 rounded-xl text-sm font-medium transition-all capitalize",
-                    documentType === type
-                      ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                      : "bg-white/5 text-gray-400 border border-transparent hover:bg-white/10"
-                  )}
-                >
-                  {type}
-                </button>
-              ))}
+            <div className="flex items-center justify-center mb-10">
+              <div className="bg-dark-900/50 p-1.5 rounded-2xl border border-white/5 inline-flex backdrop-blur-sm relative">
+                {(["invoice", "proposal"] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setDocumentType(type)}
+                    className={cn(
+                      "px-8 py-3 rounded-xl text-sm font-semibold transition-all capitalize relative z-10",
+                      documentType === type
+                        ? "bg-amber-500 text-dark-900 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Service Category */}
-            <div className="mb-6">
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+            <div className="mb-8">
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
                 Service Category
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat.value}
                     onClick={() => setServiceCategory(cat.value)}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all",
+                      "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300",
                       serviceCategory === cat.value
-                        ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                        : "bg-white/5 text-gray-400 border border-transparent hover:bg-white/10"
+                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)] scale-[1.02]"
+                        : "bg-dark-900/50 text-gray-400 border border-white/5 hover:bg-white/5 hover:text-gray-200"
                     )}
                   >
-                    <cat.icon className="w-3.5 h-3.5" />
+                    <cat.icon className="w-4 h-4 opacity-80" />
                     {cat.label}
                   </button>
                 ))}
@@ -331,53 +337,56 @@ export default function GeneratePage() {
             </div>
 
             {/* Client Selection */}
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="group relative">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
                   Select Client
                 </label>
                 <select
                   value={selectedClientId}
                   onChange={(e) => setSelectedClientId(e.target.value)}
-                  className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-all appearance-none"
+                  className="w-full bg-dark-900/80 border border-white/5 rounded-2xl px-5 py-3.5 text-sm text-white focus:bg-dark-900 transition-all appearance-none cursor-pointer"
                 >
-                  <option value="new">-- New / One-off Client --</option>
+                  <option value="new" className="bg-dark-900">-- New / One-off Client --</option>
                   {clients.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} {c.company ? `(${c.company})` : ""}</option>
+                    <option key={c.id} className="bg-dark-900" value={c.id}>{c.name} {c.company ? `(${c.company})` : ""}</option>
                   ))}
                 </select>
+                <div className="absolute right-4 bottom-3.5 pointer-events-none opacity-50">▼</div>
               </div>
 
               {selectedClientId === "new" && (
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Client&apos;s State <span className="normal-case text-gray-600">(for GST calculation)</span>
+                <div className="group animate-in fade-in slide-in-from-top-2 duration-300 relative">
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+                    Client&apos;s State <span className="normal-case text-gray-600 font-normal tracking-normal">(for GST calculation)</span>
                   </label>
                   <select
                     value={clientStateCode}
                     onChange={(e) => setClientStateCode(e.target.value)}
-                    className="w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500/40 transition-all appearance-none"
+                    className="w-full bg-dark-900/80 border border-white/5 rounded-2xl px-5 py-3.5 text-sm text-white focus:bg-dark-900 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="">Same state as mine (intra-state)</option>
+                    <option value="" className="bg-dark-900">Same state as mine (intra-state)</option>
                     {INDIAN_STATES.map((s) => (
-                      <option key={s.code} value={s.code}>{s.code} — {s.name}</option>
+                      <option key={s.code} className="bg-dark-900" value={s.code}>{s.code} — {s.name}</option>
                     ))}
                   </select>
+                  <div className="absolute right-4 bottom-3.5 pointer-events-none opacity-50">▼</div>
                 </div>
               )}
             </div>
 
             {/* Text Input */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                  <PenTool className="w-3.5 h-3.5" />
                   Project Description
                 </label>
                 <button
                   onClick={loadExample}
-                  className="text-xs text-amber-500 hover:text-amber-400 transition-colors"
+                  className="text-xs font-medium text-amber-500 hover:text-amber-400 transition-colors flex items-center gap-1 group"
                 >
-                  Load example →
+                  Load prompt <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                 </button>
               </div>
               <textarea
@@ -386,15 +395,18 @@ export default function GeneratePage() {
                   setInputText(e.target.value);
                   setError(null);
                 }}
-                placeholder={`Describe your project here...\n\nExample: "${EXAMPLE_INPUTS[serviceCategory as keyof typeof EXAMPLE_INPUTS] || EXAMPLE_INPUTS.developer}"`}
-                className="w-full h-44 bg-dark-700 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-amber-500/40 focus:ring-1 focus:ring-amber-500/20 transition-all"
+                placeholder={`Describe your project loosely...\n\nExample: "${EXAMPLE_INPUTS[serviceCategory as keyof typeof EXAMPLE_INPUTS] || EXAMPLE_INPUTS.developer}"`}
+                className="w-full h-48 bg-dark-900/50 border border-white/5 rounded-2xl px-6 py-5 text-[15px] leading-relaxed text-white placeholder-gray-600/70 resize-none hover:border-white/10 transition-all"
               />
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-xs text-gray-600">
-                  {inputText.length}/5000 characters
+              <div className="flex items-center justify-between mt-3 px-1">
+                <span className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">
+                  {inputText.length} / 5000 characters
                 </span>
                 {error && (
-                  <span className="text-xs text-red-400">{error}</span>
+                  <span className="text-xs font-medium text-red-400 flex items-center gap-1.5 animate-in slide-in-from-right-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                    {error}
+                  </span>
                 )}
               </div>
             </div>

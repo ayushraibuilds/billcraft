@@ -24,26 +24,26 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-32 pb-20 section-padding overflow-hidden">
+      <section className="relative pt-32 pb-24 section-padding overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-amber-500/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-amber-500/10 via-orange-500/5 to-transparent rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 mb-8">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-xs font-medium text-amber-400">
+        <div className="relative mx-auto max-w-5xl text-center">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-full px-5 py-2 mb-10 shadow-[0_0_20px_rgba(245,158,11,0.15)] animate-in slide-in-from-bottom-4 duration-700">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span className="text-sm font-semibold text-amber-400">
               AI-powered · GST compliant · Free to start
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
-            Messy notes to{" "}
-            <span className="gradient-text">professional invoices</span>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-8 animate-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
+            Messy notes to<br/>
+            <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_4px_15px_rgba(245,158,11,0.25)]">professional invoices</span>
             <br />
             in 60 seconds
           </h1>
 
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-400/90 max-w-2xl mx-auto mb-12 leading-relaxed animate-in slide-in-from-bottom-8 duration-700 delay-300 fill-mode-both">
             Stop spending hours formatting invoices and proposals. Paste your
             project description — even in Hinglish — and get a polished,
             GST-compliant PDF ready to send to your client.
